@@ -277,7 +277,7 @@ For information on stunnel global options, see [the stunnel documentation](https
 ### install\_service ###
 
 Specify whether you want this stunnel Puppet module to install stunnel as a
-system service. Installing as a service currently places a sysvinit style
+system service. Installing as a service currently places a initinit style
 initscript for each tunnel inside of /etc/init.d/stunnel-\<name\>.
 
     install_service => false,
@@ -291,15 +291,15 @@ will be removed.
 
 ### service\_init\_system ###
 
-Specify which init system will be managing the service. If set to 'sysv' then
-a sysvinit style initscript for each tunnel will be placed inside of
+Specify which init system will be managing the service. If set to 'init' then
+a initinit style initscript for each tunnel will be placed inside of
 /etc/init.d/stunnel-\<name\>. If set to 'systemd' then a systemd service unit
 config will be placed in /etc/systemd/system/stunnel-\<name\>.service.
 
-    service_init_system => 'sysv',
+    service_init_system => 'init',
     service_init_system => 'systemd',
 
-This attribute is optional and defaults to `sysv`.
+This attribute is optional and defaults to `init`.
 
 ### options ###
 

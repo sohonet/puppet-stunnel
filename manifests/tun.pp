@@ -59,9 +59,9 @@
 #   Defaults to true
 #
 # [*service_init_system*]
-#   Which init system will be managing this service. Valid values are 'sysv'
+#   Which init system will be managing this service. Valid values are 'init'
 #   and 'systemd'.
-#   Defaults to 'sysv'
+#   Defaults to 'init'
 #
 define stunnel::tun (
   $accept,
@@ -127,8 +127,8 @@ define stunnel::tun (
     'UNSET' => $::stunnel::data::service_init_system,
     default => $service_init_system,
   }
-  validate_re( $service_init_system_real, '^(sysv|systemd)$',
-    '$service_init_system must be either \'sysv\' or \'systemd\'')
+  validate_re( $service_init_system_real, '^(init|systemd)$',
+    '$service_init_system must be either \'init\' or \'systemd\'')
 
   $pid = "${stunnel::data::pid_dir}/stunnel-${name}.pid"
   $output_r = $output ? {
@@ -155,7 +155,7 @@ define stunnel::tun (
   } else {
     $initscript_ensure = 'absent'
   }
-  if $service_init_system_real == 'sysv' {
+  if $service_init_system_real == 'init' {
     $initscript_file = "/etc/init.d/stunnel-${name}"
     file { $initscript_file:
       ensure  => $initscript_ensure,
@@ -193,6 +193,7 @@ define stunnel::tun (
     service { "stunnel-${name}":
       ensure    => $service_ensure_real,
       enable    => $service_enable,
+      provider  => $service_init_system_real,
       require   => $service_require,
       before    => $service_before,
       subscribe => File[$config_file],

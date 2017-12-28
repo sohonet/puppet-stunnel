@@ -20,7 +20,7 @@ class stunnel::data {
       if versioncmp($::operatingsystemmajrelease, '7') >= 0 {
         $service_init_system = 'systemd'
       } else {
-        $service_init_system = 'sysv'
+        $service_init_system = 'init'
       }
     }
     /Debian/: {
@@ -40,7 +40,7 @@ class stunnel::data {
          ($::operatingsystem == 'Debian' and versioncmp($::operatingsystemrelease, '8.0') >= 0) {
         $service_init_system = 'systemd'
       } else {
-        $service_init_system = 'sysv'
+        $service_init_system = 'init'
       }
     }
 

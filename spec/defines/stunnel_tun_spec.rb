@@ -23,7 +23,7 @@ describe( 'stunnel::tun', :type => :define ) do
      end
    end
 
-   it 'should contain a sysv init script' do
+   it 'should contain a init init script' do
      should contain_file('/etc/init.d/stunnel-my-tunnel').with_ensure('present')
    end
 
