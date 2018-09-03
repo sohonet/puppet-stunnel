@@ -190,13 +190,24 @@ define stunnel::tun (
       $service_require = File[$initscript_file]
       $service_before = undef
     }
-    service { "stunnel-${name}":
-      ensure    => $service_ensure_real,
-      enable    => $service_enable,
-      provider  => $service_init_system_real,
-      require   => $service_require,
-      before    => $service_before,
-      subscribe => File[$config_file],
+
+    if versioncmp('4.0', $::puppetversion) > 0 {
+      service { "stunnel-${name}":
+        ensure    => $service_ensure_real,
+        enable    => $service_enable,
+        provider  => $service_init_system_real,
+        require   => $service_require,
+        before    => $service_before,
+        subscribe => File[$config_file],
+      }
+    } else {
+      service { "stunnel-${name}":
+        ensure    => $service_ensure_real,
+        enable    => $service_enable,
+        require   => $service_require,
+        before    => $service_before,
+        subscribe => File[$config_file],
+      }
     }
   }
 }
