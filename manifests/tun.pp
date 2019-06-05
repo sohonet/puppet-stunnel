@@ -191,7 +191,7 @@ define stunnel::tun (
       $service_before = undef
     }
 
-    if versioncmp('4.0', $::puppetversion) > 0 {
+    if $service_ensure {
       service { "stunnel-${name}":
         ensure    => $service_ensure_real,
         enable    => $service_enable,
@@ -201,12 +201,11 @@ define stunnel::tun (
         subscribe => File[$config_file],
       }
     } else {
-      service { "stunnel-${name}":
-        ensure    => $service_ensure_real,
-        enable    => $service_enable,
-        require   => $service_require,
-        before    => $service_before,
-        subscribe => File[$config_file],
+      exec { "systemctl-enable-${name}":
+        command     => "systemctl enable stunnel-${name}",
+        subscribe   => File[$config_file],
+        unless      => "systemctl is-enabled stunnel-${name}",
+        path        => $facts['path'],
       }
     }
   }
