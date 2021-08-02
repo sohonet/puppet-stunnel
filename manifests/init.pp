@@ -2,7 +2,9 @@
 #
 # STunnel Management
 #
-class stunnel {
+class stunnel (
+  Optional[String] $ensure = installed,
+) {
   file { '/usr/local/bin/stunnel-combine-certs':
     ensure => 'present',
     owner  => 'root',
