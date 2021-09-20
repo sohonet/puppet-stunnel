@@ -5,7 +5,7 @@
 class stunnel::data {
   case $::osfamily {
     /RedHat/: {
-      $package = [ 'stunnel', 'redhat-lsb' ]
+      $package = { 'stunnel' => { ensure => $stunnel::ensure }, 'redhat-lsb' => {} }
       $service = 'stunnel'
       $bin_name = 'stunnel'
       $bin_path = '/usr/bin'
@@ -24,7 +24,7 @@ class stunnel::data {
       }
     }
     /Debian/: {
-      $package = [ 'stunnel4', 'lsb-base' ]
+      $package = { 'stunnel4' => { ensure => $stunnel::ensure }, 'lsb-base' => {} }
       $service = 'stunnel'
       $bin_name = 'stunnel4'
       $bin_path = '/usr/bin'
