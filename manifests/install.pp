@@ -5,5 +5,5 @@
 class stunnel::install {
   require stunnel::data
 
-  ensure_packages( $stunnel::data::package )
+  stdlib::ensure_packages( $stunnel::data::package )
 }

@@ -2,7 +2,7 @@
 <% if @cert_real != '' -%>
 cert = <%= @cert_real %>
 <% end -%>
-<% if @cafile_real != '' -%>
+<% if @cafile_real -%>
 CAfile = <%= @cafile_real %>
 <% else -%>
 # CAfile = /path/to/cafile.crt
@@ -14,7 +14,7 @@ pid = <%= @pid %>
 
 debug = <%= @debug %>
 
-output = <%= @output_r %>
+output = <%= @output %>
 
 <% @options_r.each do |option| -%>
 options = <%= option %>

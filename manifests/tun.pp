@@ -66,34 +66,27 @@
 define stunnel::tun (
   $accept,
   $connect,
-  $cafile = '',
-  $cert = 'UNSET',
-  $client = false,
-  $options = [ ],
-  $failover = 'rr',
+  Optional[Stdlib::Absolutepath] $cafile = undef,
+  Optional[Stdlib::Absolutepath] $cert = undef,
+  Boolean $client = false,
+  Variant[String, Array] $options = [],
+  Enum['rr', 'prio'] $failover = 'rr',
   $template = 'stunnel/tun.erb',
   $timeoutidle = '43200',
   $debug = '5',
   $install_service = true,
   $service_ensure = 'running',
-  $service_init_system = 'UNSET',
-  $output = 'UNSET',
-  $global_opts = { },
-  $service_opts = { },
+  Enum['systemd', 'init'] $service_init_system = $stunnel::data::service_init_system,
+  Stdlib::Absolutepath $output = "${stunnel::data::log_dir}/${name}.log",
+  Hash $global_opts = { },
+  Hash $service_opts = { },
   $ensure = 'present',
 ) {
   require stunnel
   include stunnel::data
 
-  validate_hash( $global_opts )
-  validate_hash( $service_opts )
-  validate_re( $failover, '^(rr|prio)$', '$failover must be either \'rr\' or \'prio\'')
-  validate_re( $ensure, '^(absent|present)$', '$ensure must be either \'absent\' or \'present\'')
-
-  $cafile_real = $cafile ? {
-    'UNSET' => '',
-    default => $cafile,
-  }
+  # Compat
+  $cafile_real = $cafile
 
   # Clients don't require a certificate but servers do
   if $client {
@@ -101,41 +94,20 @@ define stunnel::tun (
   } else {
     $cert_default = "${stunnel::data::cert_dir}/${name}.pem"
   }
-  if $cert == 'UNSET' {
+
+  if $cert == undef {
     $cert_real = $cert_default
   } else {
     $cert_real = $cert
   }
 
-  if $cafile_real != '' {
-    validate_absolute_path( $cafile_real )
+  $options_r = $options ? {
+    String => [$options],
+    Array => $options,
+    default => fail('$options must be an array, or a string containing a single option'),
   }
-  if $cert_real != '' {
-    validate_absolute_path( $cert_real )
-  }
-  validate_bool( str2bool($client) )
-
-  if is_string($options) {
-    $options_r = [ $options ]
-  } elsif is_array($options) {
-    $options_r = $options
-  } else {
-    fail('$options must be an array, or a string containing a single option')
-  }
-
-  $service_init_system_real = $service_init_system ? {
-    'UNSET' => $::stunnel::data::service_init_system,
-    default => $service_init_system,
-  }
-  validate_re( $service_init_system_real, '^(init|systemd)$',
-    '$service_init_system must be either \'init\' or \'systemd\'')
 
   $pid = "${stunnel::data::pid_dir}/stunnel-${name}.pid"
-  $output_r = $output ? {
-    'UNSET' => "${::stunnel::data::log_dir}/${name}.log",
-    default => $output,
-  }
-  validate_absolute_path($output_r)
 
   $prog = $stunnel::data::bin_name
   $svc_bin = "${stunnel::data::bin_path}/${stunnel::data::bin_name}"
@@ -155,7 +127,7 @@ define stunnel::tun (
   } else {
     $initscript_ensure = 'absent'
   }
-  if $service_init_system_real == 'init' {
+  if $service_init_system == 'init' {
     $initscript_file = "/etc/init.d/stunnel-${name}"
     file { $initscript_file:
       ensure  => $initscript_ensure,
@@ -164,7 +136,7 @@ define stunnel::tun (
       mode    => '0550',
       content => template('stunnel/stunnel.init.erb'),
     }
-  } elsif $service_init_system_real == 'systemd' {
+  } elsif $service_init_system == 'systemd' {
     $initscript_file = "/etc/systemd/system/stunnel-${name}.service"
     file { $initscript_file:
       ensure  => $initscript_ensure,
